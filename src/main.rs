@@ -76,7 +76,7 @@ fn init_project(directory:String)->Result<(),io::Error>{
     fs::create_dir(src)?;
 
     //`main.cpp` file
-    let main_cpp = directory+&String::from("/main.cpp");
+    let main_cpp = directory+&String::from("/src/main.cpp");
     let mut main_cpp = File::create(main_cpp)?;
 
     //c++ code
