@@ -49,13 +49,13 @@ fn run_command(command: Command)->Result<() ,io::Error> {
     let subact=command.subaction.clone();
     let _new_s = String::from("new");
     let _init_s = String::from("init");
-    match command.action[..].to_lowercase() {
-        _new_s=>new_project(subact),
-        _init_s=>init_project(subact),
-        _=>{
-            print_help();
-            process::exit(1);
-        }
+    if command.action==_new_s{
+        new_project(subact)
+    }else if command.action==_init_s{
+        init_project(subact)
+    }else{
+        print_help();
+        process::exit(1);
     }
 }
 
