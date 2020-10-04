@@ -1,6 +1,8 @@
-use std::fs::{self, File};
-use std::io::{self, Write};
+pub mod config;
+mod project;
 
+use std::{env,io};
+use config::help;
 ///struct Command with two parameters
 /// action:
 ///     new    create new directory to create project
@@ -32,8 +34,6 @@ impl Command {
         let subaction: Vec<String> = args.collect();
         Ok(Command { action, subaction })
     }
-
-    
 }
 
 /// relate project
@@ -44,65 +44,38 @@ impl Command {
         let _init_s = String::from("init");
         let _help_s = String::from("--help");
         if self.action == _new_s {
-            Command::new_project(subact[0].clone())
+            match project::new_project(subact[0].clone()) {
+                Ok(s) => Ok(QcproReturnKind::Success(s)),
+                Err(e)=> Err(e),
+            }
         } else if self.action == _init_s {
-            Command::init_project(&subact[0])
+            let dir : String = match subact.len(){
+                0=> {
+                    match env::current_dir()?.to_str() {
+                        Some(s)=> String::from(s),
+                        None => return Err(io::Error::from(io::ErrorKind::UnexpectedEof)),
+                    }
+                }
+                _=> subact[0].clone(),
+            };
+            match project::init_project(&dir) {
+                Ok(s) => Ok(QcproReturnKind::Success(s)),
+                Err(e)=> Err(e),
+            }
         } else if self.action == _help_s || self.subaction.contains(&String::from("--help")) {
             print_help();
-            Err(io::Error::from(io::ErrorKind::Other))
+            Ok(QcproReturnKind::PrintHelp)
         } else {
             Err(io::Error::from(io::ErrorKind::InvalidInput))
         }
     }
     
-    /// create new directory the init project
-    fn new_project(directory: String) -> Result<QcproReturnKind, io::Error> {
-        match fs::create_dir(directory.clone()) {
-            Ok(()) => {
-                match Command::init_project(&directory)
-                {
-                    Ok(_kind) => Ok(QcproReturnKind::Success(format!(
-                        "Success create project: {}",
-                        directory
-                    ))),
-                    Err(e)=>Err(e),
-                }
-                
-            }
-            Err(e) => Err(e),
-        }
-    }
     
-    /// initialize project
-    /// create two directories name of `include` and `src`
-    /// create file `main.cpp` in directoy `src`
-    fn init_project(directory: &String) -> Result<QcproReturnKind, io::Error> {
-        //`include` directory
-        let include = directory.clone() + "/include";
-        fs::create_dir(include)?;
-    
-        //`src` directory
-        let src = directory.clone() + "/src";
-        fs::create_dir(src)?;
-    
-        //`main.cpp` file
-        let main_cpp = directory.clone() + "/src/main.cpp";
-        let mut main_cpp = File::create(main_cpp)?;
-    
-        //c++ code
-        let code = "#include<iostream>\nint main()\n{\n    std::cout<<\"Hello, world!\"<<std::endl;\n    return 0;\n}";
-        let code_buf = code.as_bytes();
-        main_cpp.write(code_buf)?;
-        Ok(QcproReturnKind::Success(format!(
-            "Success init project: {}",
-            directory
-        )))
-    }
 }
 
 pub fn print_help() {
-    println!("qcpro [action] [subaction]");
-    println!("  action:");
-    println!("    new    create new project name of subaction");
-    println!("    init   initialize project for directory that name of subaction");
+    match help::print_help() {
+        Err(e) => panic!(e),
+        _=>{},
+    }
 }

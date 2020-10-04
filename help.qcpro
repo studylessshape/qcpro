@@ -1,0 +1,7 @@
+
+Example: qcpro [action] [subaction]
+  action:
+    new    create new project name of subaction
+    init   initialize project for directory that name of subaction
+  subaction:
+    <directory name>    the directory of project. If use action `init`, it can nothing and will initialize project on current directory
