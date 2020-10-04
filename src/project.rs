@@ -68,6 +68,6 @@ pub fn init_project(directory: String) -> Result<String, io::Error> {
     fs::write(cmake_file_name, cmake_contents)?;
     Ok(format!(
         "Success init project: {}",
-        project_directoy
+        last_directory
     ))
 }
