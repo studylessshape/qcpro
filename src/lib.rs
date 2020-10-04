@@ -1,5 +1,5 @@
-pub mod config;
 mod project;
+pub mod config;
 
 use std::io;
 pub use config::help;
@@ -43,13 +43,14 @@ impl Command {
         let _new_s = String::from("new");
         let _init_s = String::from("init");
         let _help_s = String::from("--help");
+        let _cmake_s = String::from("cmake");
         if self.action == _new_s {
             let dir : String = match subact.len(){
                 0=> return Err(io::Error::from(io::ErrorKind::InvalidInput)),
                 _=> subact[0].clone(),
             };
             match project::new_project(dir) {
-                Ok(s) => Ok(QcproReturnKind::Success(s)),
+                Ok(s) => Ok(QcproReturnKind::Success(format!("new {}", s))),
                 Err(e)=> Err(e),
             }
         } else if self.action == _init_s {
@@ -58,13 +59,18 @@ impl Command {
                 _=> subact[0].clone(),
             };
             match project::init_project(dir) {
-                Ok(s) => Ok(QcproReturnKind::Success(s)),
+                Ok(s) => Ok(QcproReturnKind::Success(format!("init {}", s))),
                 Err(e)=> Err(e),
             }
         } else if self.action == _help_s || self.subaction.contains(&String::from("--help")) {
             print_help();
             Ok(QcproReturnKind::PrintHelp)
-        } else {
+        }else if self.action == _cmake_s{
+            match project::cmake_build_project(&self.subaction) {
+                Ok(s) => Ok(QcproReturnKind::Success(s)),
+                Err(e)=> Err(e),
+            }
+        }else {
             Err(io::Error::from(io::ErrorKind::InvalidInput))
         }
     }
