@@ -1,10 +1,10 @@
-use std::io;
+use std::{io,env};
 use std::fs::{self, File};
 /// create new directory the init project
 pub fn new_project(directory: String) -> Result<String, io::Error> {
     match fs::create_dir(directory.clone()) {
         Ok(()) => {
-            match init_project(&directory)
+            match init_project(directory.clone())
             {
                 Ok(_kind) => Ok(format!(
                     "Success create project: {}",
@@ -21,7 +21,28 @@ pub fn new_project(directory: String) -> Result<String, io::Error> {
 /// initialize project
 /// create two directories name of `include` and `src`
 /// create file `main.cpp` in directoy `src`
-pub fn init_project(directory: &String) -> Result<String, io::Error> {
+pub fn init_project(directory: String) -> Result<String, io::Error> {
+    let mut project_directoy = {
+        if directory.clone() == String::from("."){
+            String::from(
+                match env::current_dir()?.to_str() {
+                    Some(s)=>s,
+                    None=>"."
+                }
+            )
+        }else{
+            directory.clone()
+        }
+    };
+    let mut last_directory : String = String::new();
+    loop {
+        let s = project_directoy.pop().unwrap();
+        if s == '\\' {
+            break;
+        }else{
+            last_directory.insert(0, s);
+        }
+    }
     //`include` directory
     let include = directory.clone() + "/include";
     fs::create_dir(include)?;
@@ -39,14 +60,14 @@ pub fn init_project(directory: &String) -> Result<String, io::Error> {
     fs::write(main_cpp_name, code)?;
 
     //cmake file
-    let cmake_file_name = directory.clone() + "/CMakeLists.txt";
+    let cmake_file_name = directory + "/CMakeLists.txt";
     let cmake_contents = format!("{}\n{}{}{}\n{}{}{}",
                                 "cmake_minimum_required(VERSION 3.10)",
-                                "project(", directory.clone(), ")",
-                                "add_executable(", directory.clone(), " src/main.cpp)");
+                                "project(", last_directory.clone(), ")",
+                                "add_executable(", last_directory, " src/main.cpp)");
     fs::write(cmake_file_name, cmake_contents)?;
     Ok(format!(
         "Success init project: {}",
-        directory
+        project_directoy
     ))
 }

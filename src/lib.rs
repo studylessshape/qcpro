@@ -1,8 +1,8 @@
 pub mod config;
 mod project;
 
-use std::{env,io};
-use config::help;
+use std::io;
+pub use config::help;
 ///struct Command with two parameters
 /// action:
 ///     new    create new directory to create project
@@ -44,21 +44,20 @@ impl Command {
         let _init_s = String::from("init");
         let _help_s = String::from("--help");
         if self.action == _new_s {
-            match project::new_project(subact[0].clone()) {
+            let dir : String = match subact.len(){
+                0=> return Err(io::Error::from(io::ErrorKind::InvalidInput)),
+                _=> subact[0].clone(),
+            };
+            match project::new_project(dir) {
                 Ok(s) => Ok(QcproReturnKind::Success(s)),
                 Err(e)=> Err(e),
             }
         } else if self.action == _init_s {
             let dir : String = match subact.len(){
-                0=> {
-                    match env::current_dir()?.to_str() {
-                        Some(s)=> String::from(s),
-                        None => return Err(io::Error::from(io::ErrorKind::UnexpectedEof)),
-                    }
-                }
+                0=> String::from("."),
                 _=> subact[0].clone(),
             };
-            match project::init_project(&dir) {
+            match project::init_project(dir) {
                 Ok(s) => Ok(QcproReturnKind::Success(s)),
                 Err(e)=> Err(e),
             }
