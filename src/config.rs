@@ -5,8 +5,7 @@
 ///     - Init program
 
 pub mod help{
-    use std::io;
-    use std::fs;
+    use std::{io,fs,env};
 
     /// Through reading file or creating file, get the string of help.Then print on cmd or shell 
     pub fn print_help() -> Result<(), io::Error> {
@@ -34,17 +33,33 @@ pub mod help{
 
     //create file name of 'help.qcpro'
     fn create_help_file() -> Result<String, io::Error> {
-        let file_name = "help.qcpro";
-        fs::File::create(file_name)?;
-        let contents = format!("\n{}\n{}\n{}\n{}\n{}\n{}\n",
-                        "Example: qcpro [action] [subaction]",
-                        "  action:",
-                        "    new    create new project name of subaction",
-                        "    init   initialize project for directory that name of subaction",
-                        "  subaction:",
-                        "    <directory name>    the directory of project. If use action `init`, it can nothing and will initialize project on current directory");
+        let current_path = match env::current_exe(){
+            Ok(path)=>path,
+            Err(e)=>return Err(e),
+        };
+        let mut current_path = String::from(current_path.to_str().unwrap());
+        loop {
+            let ch = current_path.pop().unwrap();
+            if ch == '\\' || ch == '/' {
+                current_path.push(ch);
+                break;
+            }
+        }
+        let file_path = current_path + &String::from("help.qcpro");
+        fs::File::create(file_path.clone())?;
+        let contents = format!("\n{}\n",
+"Example: qcpro [action] [subaction]
+action:
+  new    create new project name of subaction.
+  init   initialize project for directory that name of subaction.
+  cmake  use cmake to quick build projcet
+subaction:
+  <directory name>    the directory of project. If use action `init`, it can nothing and will initialize project on current directory.
+                      If use `cmake`, it can run with two subactions one of source and other of build target.It can also be nothing and it will build with default path.
+special:
+  --help    Print help to screen.");
         
-        fs::write(file_name, &contents)?;
+        fs::write(file_path, &contents)?;
         Ok(contents)
     }
 }

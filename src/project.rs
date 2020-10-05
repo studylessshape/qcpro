@@ -1,7 +1,8 @@
-use std::{io::{self, Write},env};
+use std::env;
+use std::io::{self, Write};
 use std::fs::{self, File};
 use std::process::Command;
-/// create new directory the init project
+/// Create new directory and init project
 pub fn new_project(directory: String) -> Result<String, io::Error> {
     match fs::create_dir(directory.clone()) {
         Ok(()) => {
@@ -15,10 +16,11 @@ pub fn new_project(directory: String) -> Result<String, io::Error> {
     }
 }
 
-/// initialize project
-/// create two directories name of `include` and `src`
-/// create file `main.cpp` in directoy `src`
+/// Initialize project
+/// Create two directories name of `include` and `src`
+/// Create file `main.cpp` in directoy `src`
 pub fn init_project(directory: String) -> Result<String, io::Error> {
+    //Judge the directory is current directory or '.'
     let mut project_directoy = {
         if directory.clone() == String::from("."){
             String::from(
@@ -31,6 +33,8 @@ pub fn init_project(directory: String) -> Result<String, io::Error> {
             directory.clone()
         }
     };
+
+    //Get the last directory name
     let mut last_directory : String = String::new();
     if project_directoy.contains('\\') || project_directoy.contains('/') {
         loop {
@@ -94,5 +98,9 @@ pub fn cmake_build_project(target : &Vec<String>) -> Result<String, io::Error> {
     io::stdout().write_all(&output.stdout).unwrap();
     io::stderr().write_all(&output.stderr).unwrap();
     println!("status: {}", output.status);
-    Ok(String::from("use cmake build!"))
+    if output.status.success() {
+        Ok(String::from("use cmake build!"))
+    }else{
+        Err(io::Error::from(io::ErrorKind::Other))
+    }
 }

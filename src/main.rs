@@ -1,6 +1,5 @@
 use qcpro::{Command, QcproReturnKind};
-use std::env;
-use std::process;
+use std::{process,env};
 use ansi_term::Colour;
 fn main() {
     match Command::new(env::args()) {
