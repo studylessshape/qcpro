@@ -11,6 +11,7 @@ fn main() {
             }
             Err(e) => {
                 println!("{}: {:#}", Colour::Red.bold().paint("Error"), e);
+                process::exit(1);
             }
         }
         Err(s) => {

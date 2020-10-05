@@ -36,6 +36,7 @@
 |`init`|(`<directory>`)|初始化一个项目（项目文件夹存在）|
 |`--help`||打印帮助|
 |`cmake`|(`<source directory path>`) (`<build target directory path>`)|使用CMake构建项目，如果需要指定位置，需要源码和目标位置均输入（确保安装了CMake并且添加了环境变量）|
+|`compile`||使用g++简单快速编译项目|
 ##  About Project
 创建或初始化的项目拥有两个文件夹`include`和`src`，两个文件`src/main.cpp`和`CMakeList.txt`
 - 文件内容

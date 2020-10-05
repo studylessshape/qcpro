@@ -33,11 +33,10 @@ pub mod help{
 
     //create file name of 'help.qcpro'
     fn create_help_file() -> Result<String, io::Error> {
-        let current_path = match env::current_exe(){
-            Ok(path)=>path,
+        let mut current_path = match env::current_exe(){
+            Ok(path)=> String::from(path.to_str().unwrap()),
             Err(e)=>return Err(e),
         };
-        let mut current_path = String::from(current_path.to_str().unwrap());
         loop {
             let ch = current_path.pop().unwrap();
             if ch == '\\' || ch == '/' {
@@ -50,14 +49,15 @@ pub mod help{
         let contents = format!("\n{}\n",
 "Example: qcpro [action] [subaction]
 action:
-  new    create new project name of subaction.
-  init   initialize project for directory that name of subaction.
-  cmake  use cmake to quick build projcet
+  new      create new project name of subaction
+  init     initialize project for directory that name of subaction
+  cmake    use cmake to quickly build projcet
+  compile  use g++ to simply and quickly compile project
 subaction:
-  <directory name>    the directory of project. If use action `init`, it can nothing and will initialize project on current directory.
-                      If use `cmake`, it can run with two subactions one of source and other of build target.It can also be nothing and it will build with default path.
+  <directory name>    the directory of project. If use action `init`, it can nothing and will initialize project on current directory
+                      If use `cmake`, it can run with two subactions one of source and other of build target.It can also be nothing and it will build with default path
 special:
-  --help    Print help to screen.");
+  --help    Print help to screen");
         
         fs::write(file_path, &contents)?;
         Ok(contents)
