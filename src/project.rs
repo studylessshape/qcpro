@@ -114,6 +114,7 @@ pub fn run_project() -> Result<String, io::Error> {
 fn run_shell() -> Result<String, io::Error> {
     build_project(false)?;
     let project_name = get_project_name(&String::from("CMakeLists.txt"), false).unwrap();
+    println!("{}",project_name);
     let output = Command::new("make").arg("-C").arg("build").output()?;
 
     if output.status.success() {
@@ -269,7 +270,7 @@ pub fn get_project_name(source: &String, is_directory: bool) -> Option<String> {
                 None => return None,
             };
             let contents: Vec<char> = contents.chars().collect();
-            for idx in fir + pat.len() + 1..contents.len() {
+            for idx in fir + pat.len()..contents.len() {
                 if contents[idx] == ')' {
                     break;
                 }
