@@ -7,7 +7,7 @@ use std::process::Command;
 
 // >>---Self mod use---<<
 use crate::addition;
-
+use super::build;
 /// Use g++ to compile the project
 pub fn run_project() -> Result<String, io::Error> {
     if env::consts::OS == "windows" {
@@ -18,6 +18,7 @@ pub fn run_project() -> Result<String, io::Error> {
 }
 
 fn run_shell() -> Result<String, io::Error> {
+    build::build_project(false)?;
     let project_name = addition::string::get_project_name(&String::from("CMakeLists.txt"), false).unwrap();
     let output = Command::new("make").arg("-C").arg("build").output()?;
 
