@@ -2,8 +2,9 @@ Example: qcpro [action] [subaction]
   action:
     new      create new project name of subaction
     init     initialize project for directory that name of subaction
-    cmake    use cmake to quickly build projcet
-    compile  use g++ to simply and quickly compile project
+    build    use cmake to quickly build projcet
+    run      windows: use g++ to simply and quickly compile project
+             shell: use cmake to build and use make to compile project
   subaction:
     <directory name>    the directory of project. If use action `init`, it can nothing and will initialize project on current directory
                         If use `cmake`, it can run with two subactions one of source and other of build target.It can also be nothing and it will build with default path

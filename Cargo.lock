@@ -14,7 +14,12 @@ name = "qcpro"
 version = "0.1.0"
 dependencies = [
  "ansi_term",
+ "qcpro_core",
 ]
+
+[[package]]
+name = "qcpro_core"
+version = "0.1.0"
 
 [[package]]
 name = "winapi"
