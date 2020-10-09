@@ -18,5 +18,10 @@ mod test {
 
     #[test]
     fn test_regex() {
+        std::process::Command::new("sh")
+            .args(&["-c", "cd" ,"test/build", "make"])
+            .spawn()
+            .expect("Error");
+        assert_eq!(2, 2);
     }
 }
