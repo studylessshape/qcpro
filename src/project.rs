@@ -114,19 +114,16 @@ pub fn run_project() -> Result<String, io::Error> {
 fn run_shell() -> Result<String, io::Error> {
     build_project(false)?;
     let project_name = get_project_name(&String::from("CMakeLists.txt"), false).unwrap();
-    Command::new("cd")
-        .arg("build")
-        .spawn()
-        .expect("Not found `build` directory!");
-
-    //run g++ to compile the files
-    let output = Command::new("make").output().expect("Error occured!");
+    let output = Command::new("make").arg("-C").arg("build").output()?;
 
     if output.status.success() {
-        let output = Command::new(format!("./{}", project_name)).output().expect(format!("Occured error when run {}", project_name).as_str());
+        let output = Command::new(format!("./build/{}", project_name)).output()?;
         io::stdout().write_all(&output.stdout).unwrap();
         io::stderr().write_all(&output.stderr).unwrap();
-        Ok(String::from("use make to compile project"))
+        if !output.status.success() {
+            return Err(io::Error::new(io::ErrorKind::Other, format!("run \'{}\' occured error!", project_name)));
+        }
+        Ok(String::from("use make to compile and run project"))
     } else {
         io::stdout().write_all(&output.stdout).unwrap();
         io::stderr().write_all(&output.stderr).unwrap();
