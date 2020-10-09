@@ -19,7 +19,6 @@ pub fn run_project() -> Result<String, io::Error> {
 
 fn run_shell() -> Result<String, io::Error> {
     let project_name = addition::string::get_project_name(&String::from("CMakeLists.txt"), false).unwrap();
-    println!("{}",project_name);
     let output = Command::new("make").arg("-C").arg("build").output()?;
 
     if output.status.success() {
