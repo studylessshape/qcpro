@@ -6,16 +6,25 @@ fn main() {
         Ok(com) => match com.run_command() {
             Ok(skind) => {
                 if let QcproReturnKind::Success(s) = skind {
-                    println!("{}: {}",Colour::Green.bold().paint("Success"), s);
+                    match env::consts::OS {
+                        "windows" => println!("Success: {}", s),
+                        _=>println!("{}: {}",Colour::Green.bold().paint("Success"), s),
+                    }
                 }
             }
             Err(e) => {
-                println!("{}: {:#}", Colour::Red.bold().paint("Error"), e);
+                match env::consts::OS {
+                    "windows" => println!("Error: {:#}", e),
+                    _=>println!("{}: {:#}", Colour::Red.bold().paint("Error"), e),
+                }
                 process::exit(1);
             }
         }
         Err(s) => {
-            println!("{}: {}",Colour::Red.bold().paint("Error"), s);
+            match env::consts::OS {
+                "windows" => println!("Error: {:#}", s),
+                _=>println!("{}: {:#}", Colour::Red.bold().paint("Error"), s),
+            }
             process::exit(1);
         }
     };
