@@ -1,6 +1,7 @@
 use std::io;
-use super::{project, help};
 
+use super::help;
+use super::project::{new, initialize, build, run};
 ///struct Command with two parameters
 /// action:
 ///     new    create new directory to create project
@@ -17,7 +18,7 @@ pub struct Command {
 
 pub enum QcproReturnKind {
     Success(String),
-    PrintHelp,
+    Print,
 }
 
 impl Command {
@@ -41,18 +42,22 @@ impl Command {
         let subact = self.subaction.clone();
         let _new_s = String::from("new");
         let _init_s = String::from("init");
-        let _help_s = String::from("--help");
         let _build_s = String::from("build");
         let _run_s = String::from("run");
-        if self.action == _help_s || self.subaction.contains(&String::from("--help")) {
+        let _help_s = String::from("--help");
+        let _version_s = String::from("--version");
+        if self.action == _help_s || self.subaction.contains(&_help_s) {
             print_help();
-            Ok(QcproReturnKind::PrintHelp)
+            Ok(QcproReturnKind::Print)
+        }else if self.action == _version_s || self.subaction.contains(&_version_s){
+            help::print_version();
+            Ok(QcproReturnKind::Print)
         }else if self.action == _new_s {
             let dir : String = match subact.len(){
                 0=> return Err(io::Error::new(io::ErrorKind::InvalidInput, "To few arguments")),
                 _=> subact[0].clone(),
             };
-            match project::new_project(dir) {
+            match new::new_project(dir) {
                 Ok(s) => Ok(QcproReturnKind::Success(format!("new {}", s))),
                 Err(e)=> Err(e),
             }
@@ -61,17 +66,17 @@ impl Command {
                 0=> String::from("."),
                 _=> subact[0].clone(),
             };
-            match project::init_project(dir) {
+            match initialize::init_project(dir) {
                 Ok(s) => Ok(QcproReturnKind::Success(format!("init {}", s))),
                 Err(e)=> Err(e),
             }
         } else if self.action == _build_s{
-            match project::build_project(true) {
+            match build::build_project(true) {
                 Ok(s) => Ok(QcproReturnKind::Success(s)),
                 Err(e)=> Err(e),
             }
         }else if self.action == _run_s {
-            match project::run_project() {
+            match run::run_project() {
                 Ok(s)=>Ok(QcproReturnKind::Success(s)),
                 Err(e)=> Err(e),
             }

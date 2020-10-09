@@ -8,4 +8,3 @@ edition = "2018"
 
 [dependencies]
 ansi_term="*"
-qcpro_core={path = "../qcpro_core"}
