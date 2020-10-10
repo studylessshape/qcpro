@@ -1,4 +1,10 @@
-[TOC]
+- [Qcpro](#qcpro)
+  - [Install](#install)
+  - [How to use](#how-to-use)
+  - [About Project](#about-project)
+  - [PS](#ps)
+
+**中文** | [English](README_en.md)
 
 # Qcpro
 使用RUST编写的，简单的在Termux或命令行中创建和初始化一个c++项目的程序
@@ -36,8 +42,8 @@
 |`init`|(`<directory>`)|初始化一个项目（项目文件夹存在）|
 |`build`||使用CMake构建项目，相当于`cmake -S <source> -B <build>`（确保安装了CMake并且添加了环境变量）|
 |`run`||Windows: 使用g++简单快速编译项目<br/>Shell: 先Build再使用make进行编译|
-|`--help`||打印帮助|
-|`--version`||Qcpro版本|
+|`-h`/`--help`||打印帮助|
+|`-v`/`--version`||Qcpro版本|
 ##  About Project
 创建或初始化的项目拥有两个文件夹`include`和`src`，两个文件`src/main.cpp`和`CMakeList.txt`
 - 文件内容
@@ -57,4 +63,4 @@
     add_executable(<project/directory name> src/main.cpp)
     ```
 ## PS
-该项目仅为满足本人需求，日后准备实现**快捷编译**和**自定义初始化项目列表**
+部分问题目前无法解决，暂时停更

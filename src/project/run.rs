@@ -3,11 +3,11 @@ use std::env;
 use std::fs::{self, DirEntry};
 use std::io::{self, Write};
 use std::path::PathBuf;
-use std::process::Command;
+use std::process::{Command, Stdio};
 
 // >>---Self mod use---<<
-use crate::addition;
 use super::build;
+use crate::addition;
 /// Use g++ to compile the project
 pub fn run_project() -> Result<String, io::Error> {
     if env::consts::OS == "windows" {
@@ -19,32 +19,23 @@ pub fn run_project() -> Result<String, io::Error> {
 
 fn run_shell() -> Result<String, io::Error> {
     build::build_project(false)?;
-    let project_name = addition::string::get_project_name(&String::from("CMakeLists.txt"), false).unwrap();
-    let output = Command::new("make").arg("-C").arg("build").output()?;
-
-    if output.status.success() {
-        let output = Command::new(format!("./build/{}", project_name)).output()?;
-        io::stdout().write_all(&output.stdout).unwrap();
-        io::stderr().write_all(&output.stderr).unwrap();
-        if !output.status.success() {
-            return Err(io::Error::new(io::ErrorKind::Other, format!("run \'{}\' occured error!", project_name)));
-        }
-        Ok(String::from("use make to compile and run project"))
-    } else {
-        io::stdout().write_all(&output.stdout).unwrap();
-        io::stderr().write_all(&output.stderr).unwrap();
-        println!("make status: {}", output.status);
-        Err(io::Error::new(
-            io::ErrorKind::Other,
-            "make compile project occured error!",
-        ))
-    }
+    let project_name =
+        addition::string::get_project_name(&String::from("CMakeLists.txt"), false).unwrap();
+    Command::new("sh")
+        .args(vec!["-C", &format!("./build/{}", project_name)])
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .output()?;
+    Ok(String::from("Success run"))
 }
 
 fn run_win() -> Result<String, io::Error> {
     //-->>Read src files<<--
     if let Err(_e) = fs::read("CMakeLists.txt") {
-        return Err(io::Error::new(io::ErrorKind::NotFound, "Not Find file \'CMakeLists.txt\', this directory may not be a c++ project directoy"));
+        return Err(io::Error::new(
+            io::ErrorKind::NotFound,
+            "Not Find file \'CMakeLists.txt\', this directory may not be a c++ project directoy",
+        ));
     }
     let current_dir = match env::current_dir() {
         Ok(path) => String::from(path.to_str().unwrap()),
@@ -79,11 +70,12 @@ fn run_win() -> Result<String, io::Error> {
             .expect("Error occured!");
 
         if output.status.success() {
-            let output = Command::new(format!(".\\{}", project_name))
+            Command::new("cmd")
+                .args(vec!["/C", &format!(".\\{}.exe", project_name)])
+                .stdin(Stdio::piped())
+                .stdout(Stdio::inherit())
                 .output()
-                .expect(format!("Occured error when run {}", project_name).as_str());
-            io::stdout().write_all(&output.stdout).unwrap();
-            io::stderr().write_all(&output.stderr).unwrap();
+                .expect(&format!("Run \'{}\' occured error!", project_name));
             Ok(String::from("use g++ to compile project and run it"))
         } else {
             io::stdout().write_all(&output.stdout).unwrap();
