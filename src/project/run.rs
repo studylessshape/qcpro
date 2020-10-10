@@ -21,8 +21,7 @@ fn run_shell() -> Result<String, io::Error> {
     build::build_project(false)?;
     let project_name =
         addition::string::get_project_name(&String::from("CMakeLists.txt"), false).unwrap();
-    let output = Command::new("sh")
-        .args(vec!["-C", &format!("./build/{}", project_name)])
+    let output = Command::new(format!("./build/{}", project_name))
         .output()?;
     io::stdout().write_all(&output.stdout).unwrap();
     io::stderr().write_all(&output.stderr).unwrap();
