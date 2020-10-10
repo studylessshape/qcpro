@@ -4,7 +4,7 @@
   - [About Project](#about-project)
   - [PS](#ps)
 
-[中文](README.md) | **English**
+[中文](Readme.md) | **English**
 
 # Qcpro
 Quick c++ project manager, the full name of qcpro, writen by [rust](https://www.rust-lang.org/), is a simple application arm to create and initialize a c++ project.
