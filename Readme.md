@@ -33,7 +33,8 @@
       export PATH=$PATH:~/(qcpro)/target/debug
       ``` 
       设置永久变量请在.bashrc或.zshrc中添加上面的export指令
-
+  * 也可移动到其他目录并添加环境变量
+  
 ## How to use
 配置好变量后输入qcpro加以下指令即可食用（括号表示该参数可以没有）
 |Action|Subaction|Feature|
