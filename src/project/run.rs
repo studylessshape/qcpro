@@ -21,12 +21,17 @@ fn run_shell() -> Result<String, io::Error> {
     build::build_project(false)?;
     let project_name =
         addition::string::get_project_name(&String::from("CMakeLists.txt"), false).unwrap();
-    Command::new("sh")
+    let output = Command::new("sh")
         .args(vec!["-C", &format!("./build/{}", project_name)])
-        .stdin(Stdio::piped())
-        .stdout(Stdio::piped())
         .output()?;
-    Ok(String::from("Success run"))
+    io::stdout().write_all(&output.stdout).unwrap();
+    io::stderr().write_all(&output.stderr).unwrap();
+    println!("\'{}\' status: {}", project_name, output.status);
+    if output.status.success() {
+        Ok(String::from("Success run"))
+    }else{
+        Err(io::Error::new(io::ErrorKind::Other, format!("Run \'{}\' occured error!", project_name)))
+    }
 }
 
 fn run_win() -> Result<String, io::Error> {
