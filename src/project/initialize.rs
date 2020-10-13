@@ -56,14 +56,18 @@ pub fn init_project(directory: String) -> Result<String, io::Error> {
     //cmake file
     let cmake_file_name = directory + "/CMakeLists.txt";
     let cmake_contents = format!(
-        "{}\n{}{}{}\n{}{}{}",
+        "{}\n{}{}{}\n{}{}{}\n{}{}{}\n{}",
         "cmake_minimum_required(VERSION 3.10)",
         "project(",
         last_directory.clone(),
         ")",
         "add_executable(",
+        last_directory.clone(),
+        " src/*.cpp)",
+        "target_include_directories(",
         last_directory,
-        " src/main.cpp)"
+        "\n    PRIVATE",
+        "        ${PROJECT_SOURCE_DIR}/include\n)"
     );
     fs::write(cmake_file_name, cmake_contents)?;
     Ok(last_directory)
