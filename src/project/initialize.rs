@@ -63,7 +63,7 @@ pub fn init_project(directory: String) -> Result<String, io::Error> {
         ")",
         "add_executable(",
         last_directory.clone(),
-        " src/*.cpp)",
+        " src/main.cpp)",
         "target_include_directories(",
         last_directory,
         "\n    PRIVATE",
