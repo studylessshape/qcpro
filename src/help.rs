@@ -2,7 +2,7 @@
 use std::{env, fs, io};
 
 pub fn print_version() {
-    println!("qcpro --version 0.2 preview");
+    println!("qcpro --version 0.2 stable");
 }
 
 /// Through reading file or creating file, get the string of help.Then print on cmd or shell
