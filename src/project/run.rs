@@ -1,27 +1,37 @@
 // >>---std mod use---<<
 use std::env;
 use std::fs::{self, DirEntry};
-use std::io::{self, Write};
+use std::io;
 use std::path::PathBuf;
-use std::process::{Command, Stdio};
+use std::process::Command;
 
 // >>---Self mod use---<<
 use super::build;
-use crate::addition;
-/// Use g++ to compile the project
-pub fn run_project() -> Result<String, io::Error> {
+use crate::addition::string_addition;
+use crate::command::Command as QcproCommand;
+/// On windows run `run_win`, another `run_shell`. They are private function, except `run_project`.
+/// * Windows:
+///   When use `qcpro run` on windows, not like shell, it use g++ to compile file and run the executable file. It mean qcpro don't use the project directory built to compile and run.
+///   So, g++ will compile all of file end with `.cpp` and  `.c` and ignore directory `build` and `bin`(It corresponds `read_path_file`).
+/// * Shell:
+///   Before run executable file, it will use CMake to build and use make to compile. All of these is in function `build_project`
+///   Then run by the path from project name that get by function `get_project_name`
+pub fn run_project(command: QcproCommand) -> Result<String, io::Error> {
     if env::consts::OS == "windows" {
-        run_win()
+        run_win(command)
     } else {
-        run_shell()
+        run_shell(command)
     }
 }
 
-fn run_shell() -> Result<String, io::Error> {
+fn run_shell(command: QcproCommand) -> Result<String, io::Error> {
     build::build_project(false)?;
     let project_name =
-        addition::string::get_project_name(&String::from("CMakeLists.txt"), false).unwrap();
-    let exit_status = Command::new(format!("./build/{}", project_name)).status()?;
+        string_addition::get_project_name(&String::from("CMakeLists.txt"), false).unwrap();
+    let exit_status = Command::new(format!("./build/{}", project_name))
+        .args(command.subaction)
+        .args(command.options)
+        .status()?;
     if exit_status.success() {
         Ok(String::from("Success run"))
     } else {
@@ -33,8 +43,9 @@ fn run_shell() -> Result<String, io::Error> {
     }
 }
 
-fn run_win() -> Result<String, io::Error> {
-    //-->>Read src files<<--
+fn run_win(command: QcproCommand) -> Result<String, io::Error> {
+    // Read src files
+    // There are some risks if read file directly.
     if let Err(_e) = fs::read("CMakeLists.txt") {
         return Err(io::Error::new(
             io::ErrorKind::NotFound,
@@ -46,46 +57,55 @@ fn run_win() -> Result<String, io::Error> {
         Err(e) => return Err(e),
     };
     let src_path = PathBuf::from(format!("{}", current_dir));
-    let project_name: String = addition::string::get_project_name(&current_dir, true).unwrap();
+    let project_name: String = string_addition::get_project_name(&current_dir, true).unwrap();
     let s = read_path_file(&src_path, &vec![String::from("build"), String::from("bin")])?;
-    //-->>End Read<<--
+    // End Read
 
     if s.len() < 1 {
         Err(io::Error::new(io::ErrorKind::NotFound, "File not found"))
     } else {
         // Get the c/c++ files
-        let mut build_args: Vec<String> = Vec::new();
-        for file in s {
-            let file_c = file.to_lowercase();
-            if file_c.ends_with(".cpp") || file_c.ends_with(".cxx") || file_c.ends_with(".c") {
-                build_args.push(file);
-            }
-        }
+        let build_args: Vec<String> = s
+            .into_iter()
+            .filter(|file| {
+                let file_c = file.to_lowercase();
+                if file_c.ends_with(".cpp") || file_c.ends_with(".cxx") || file_c.ends_with(".c") || file_c.ends_with(".c++") || file_c.ends_with(".cc"){
+                    return true;
+                }
+                false
+            })
+            .collect();
         if build_args.len() < 1 {
             return Err(io::Error::new(io::ErrorKind::NotFound, "File not found"));
         }
-
+        match fs::create_dir("./bin") {
+            Err(e) => {
+                if !(e.kind() == io::ErrorKind::AlreadyExists) {
+                    return Err(e);
+                }
+            }
+            _ => {}
+        }
         //run g++ to compile the files
-        let output = Command::new("g++")
+        let g_compile_status = Command::new("g++")
             .arg("-o")
-            .arg(project_name.clone())
+            .arg(format!("./bin/{}", project_name.clone()))
             .args(build_args)
-            .output()
-            .expect("Error occured!");
+            .status()?;
 
-        if output.status.success() {
+        if g_compile_status.success() {
             if !Command::new("cmd")
-                .args(vec!["/C", &format!(".\\{}.exe", project_name)])
+                .args(vec!["/C", &format!(".\\bin\\{}.exe", project_name)])
+                .args(command.subaction)
+                .args(command.options)
                 .status()
                 .expect(&format!("Run \'{}\' occured error!", project_name))
-                .success(){
-                    return Err(io::Error::new(io::ErrorKind::Other, "Run Error!"));
-                }
+                .success()
+            {
+                return Err(io::Error::new(io::ErrorKind::Other, "Run Error!"));
+            }
             Ok(String::from("use g++ to compile project and run it"))
         } else {
-            io::stdout().write_all(&output.stdout).unwrap();
-            io::stderr().write_all(&output.stderr).unwrap();
-            println!("g++ status: {}", output.status);
             Err(io::Error::new(
                 io::ErrorKind::Other,
                 "g++ compile project occured error!",
@@ -143,8 +163,9 @@ pub fn is_ignore_path(path: &PathBuf, ignore: &Vec<String>) -> bool {
         return false;
     }
     let mut result = false;
+    let path_cp = String::from(path.to_str().unwrap());
     for pa in ignore {
-        if pa.eq(&last_path) {
+        if pa.eq(&last_path) || pa.eq(&path_cp) {
             result = true;
             break;
         }

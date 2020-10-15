@@ -1,12 +1,14 @@
-use std::{io, env};
 use std::fs::{self, File};
+use std::{env, io};
+
+use crate::addition::string_addition;
 
 /// Initialize project
 /// Create two directories name of `include` and `src`
 /// Create file `main.cpp` in directoy `src`
 pub fn init_project(directory: String) -> Result<String, io::Error> {
     //Judge the directory is current directory or '.'
-    let mut project_directoy = {
+    let project_directoy = {
         if directory.clone() == String::from(".") {
             String::from(match env::current_dir()?.to_str() {
                 Some(s) => s,
@@ -18,25 +20,17 @@ pub fn init_project(directory: String) -> Result<String, io::Error> {
     };
 
     //Get the last directory name
-    let mut last_directory: String = String::new();
-    if project_directoy.contains('\\') || project_directoy.contains('/') {
-        loop {
-            if project_directoy.len() < 1 {
-                break;
+    let last_directory: String = {
+        if project_directoy.contains('\\') || project_directoy.contains('/') {
+            let mut last = string_addition::get_project_name(&project_directoy, true).unwrap();
+            if last.len() < 1 {
+                last.push_str("default");
             }
-            let s = project_directoy.pop().unwrap();
-            if s == '\\' || s == '/' {
-                break;
-            } else {
-                last_directory.insert(0, s);
-            }
+            last
+        } else {
+            project_directoy.clone()
         }
-        if last_directory.len() < 1 {
-            last_directory.push_str("default");
-        }
-    } else {
-        last_directory = project_directoy.clone();
-    }
+    };
     //`include` directory
     let include = directory.clone() + "/include";
     fs::create_dir(include)?;

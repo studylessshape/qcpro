@@ -1,3 +1,5 @@
+//! Quick c++ project manager, the full name of qcpro, writen by [rust](https://www.rust-lang.org/), is a simple application arm to create and initialize a c++ project.
+
 pub mod project;
 pub mod command;
 pub mod config;

@@ -22,20 +22,17 @@ pub enum QcproReturnKind {
     Other,
 }
 
+/// Generate struct Command by args. Split action, subaction, option to different field
 impl Command {
-    /// use iter to create struct Command
     pub fn new(mut args: std::env::Args) -> Result<Command, &'static str> {
         args.next();
         let mut other: Vec<String> = Vec::new();
         let mut options: Vec<String> = Vec::new();
         for arg in args {
-            for ch in arg.chars() {
-                if ch == '-' {
-                    options.push(arg);
-                } else {
-                    other.push(arg);
-                }
-                break;
+            if arg.chars().next().unwrap() == '-' {
+                options.push(arg);
+            } else {
+                other.push(arg);
             }
         }
         let mut subaction: Vec<String> = Vec::new();
@@ -57,7 +54,7 @@ impl Command {
 
 /// relate project
 impl Command {
-    pub fn run_command(&self) -> Result<QcproReturnKind, io::Error> {
+    pub fn run_command(self) -> Result<QcproReturnKind, io::Error> {
         if self.options.len() > 0 {
             let help_s = vec![String::from("--help"), String::from("-h")];
             let version_s = vec![String::from("--version"), String::from("-v")];
@@ -120,7 +117,7 @@ impl Command {
                 Err(e) => Err(e),
             }
         } else if self.action == _run_s {
-            match run::run_project() {
+            match run::run_project(self) {
                 Ok(_) => Ok(QcproReturnKind::Other),
                 Err(e) => Err(e),
             }
