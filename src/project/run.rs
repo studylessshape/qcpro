@@ -21,13 +21,11 @@ fn run_shell() -> Result<String, io::Error> {
     build::build_project(false)?;
     let project_name =
         addition::string::get_project_name(&String::from("CMakeLists.txt"), false).unwrap();
-    let output = Command::new(format!("./build/{}", project_name)).output()?;
-    io::stdout().write_all(&output.stdout).unwrap();
-    io::stderr().write_all(&output.stderr).unwrap();
-    if output.status.success() {
+    let exit_status = Command::new(format!("./build/{}", project_name)).status()?;
+    if exit_status.success() {
         Ok(String::from("Success run"))
     } else {
-        println!("\'{}\' status: {}", project_name, output.status);
+        println!("\'{}\' status: {}", project_name, exit_status);
         Err(io::Error::new(
             io::ErrorKind::Other,
             format!("Run \'{}\' occured error!", project_name),
@@ -76,12 +74,13 @@ fn run_win() -> Result<String, io::Error> {
             .expect("Error occured!");
 
         if output.status.success() {
-            Command::new("cmd")
+            if !Command::new("cmd")
                 .args(vec!["/C", &format!(".\\{}.exe", project_name)])
-                .stdin(Stdio::piped())
-                .stdout(Stdio::inherit())
-                .output()
-                .expect(&format!("Run \'{}\' occured error!", project_name));
+                .status()
+                .expect(&format!("Run \'{}\' occured error!", project_name))
+                .success(){
+                    return Err(io::Error::new(io::ErrorKind::Other, "Run Error!"));
+                }
             Ok(String::from("use g++ to compile project and run it"))
         } else {
             io::stdout().write_all(&output.stdout).unwrap();
