@@ -1,5 +1,5 @@
 use std::env;
-use std::io;
+use std::io::{self, Write};
 use std::process::Command;
 
 use ansi_term::Colour;
@@ -7,7 +7,7 @@ use ansi_term::Colour;
 /// Use cmake to simply build project
 /// Input bool to control while print the cmake output on cmd of shell
 /// If use qcpro on shell, it will use make to compile project after cmake
-pub fn build_project(_is_output: bool) -> Result<String, io::Error> {
+pub fn build_project() -> Result<String, io::Error> {
     let source_path: String = String::from(".");
     let build_path: String = String::from("./build");
     let end_status = Command::new("cmake")
@@ -15,9 +15,10 @@ pub fn build_project(_is_output: bool) -> Result<String, io::Error> {
         .status()?;
     if end_status.success() {
         if !env::consts::OS.eq_ignore_ascii_case("windows") {
-            let end_status = Command::new("make").arg("-C").arg("build").status()?;
-            if !end_status.success() {
+            let output = Command::new("make").arg("-C").arg("build").output()?;
+            if !output.status.success() {
                 println!("{}", Colour::Yellow.paint("==================================="));
+                io::stderr().write_all(&output.stderr).unwrap();
                 return Err(io::Error::new(io::ErrorKind::Other, "Compile occured error!"));
             }
         }

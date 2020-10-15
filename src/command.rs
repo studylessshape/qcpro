@@ -112,7 +112,7 @@ impl Command {
                 Err(e) => Err(e),
             }
         } else if self.action == _build_s {
-            match build::build_project(true) {
+            match build::build_project() {
                 Ok(s) => Ok(QcproReturnKind::Success(s)),
                 Err(e) => Err(e),
             }

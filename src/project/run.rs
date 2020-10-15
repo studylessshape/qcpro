@@ -25,9 +25,10 @@ pub fn run_project(command: QcproCommand) -> Result<String, io::Error> {
 }
 
 fn run_shell(command: QcproCommand) -> Result<String, io::Error> {
-    build::build_project(false)?;
+    build::build_project()?;
     let project_name =
         string_addition::get_project_name(&String::from("CMakeLists.txt"), false).unwrap();
+    println!("Start run:");
     let exit_status = Command::new(format!("./build/{}", project_name))
         .args(command.subaction)
         .args(command.options)
