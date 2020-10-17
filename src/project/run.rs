@@ -25,13 +25,12 @@ pub fn run_project(command: QcproCommand) -> Result<String, io::Error> {
 }
 
 fn run_shell(command: QcproCommand) -> Result<String, io::Error> {
-    build::build_project()?;
+    build::build_project(false)?;
     let project_name =
         string_addition::get_project_name(&String::from("CMakeLists.txt"), false).unwrap();
     println!("Start run:");
     let exit_status = Command::new(format!("./build/{}", project_name))
         .args(command.subaction)
-        .args(command.options)
         .status()?;
     if exit_status.success() {
         Ok(String::from("Success run"))
@@ -70,7 +69,12 @@ fn run_win(command: QcproCommand) -> Result<String, io::Error> {
             .into_iter()
             .filter(|file| {
                 let file_c = file.to_lowercase();
-                if file_c.ends_with(".cpp") || file_c.ends_with(".cxx") || file_c.ends_with(".c") || file_c.ends_with(".c++") || file_c.ends_with(".cc"){
+                if file_c.ends_with(".cpp")
+                    || file_c.ends_with(".cxx")
+                    || file_c.ends_with(".c")
+                    || file_c.ends_with(".c++")
+                    || file_c.ends_with(".cc")
+                {
                     return true;
                 }
                 false
@@ -95,14 +99,11 @@ fn run_win(command: QcproCommand) -> Result<String, io::Error> {
             .status()?;
 
         if g_compile_status.success() {
-            if !Command::new("cmd")
+            let project_executable_status = Command::new("cmd")
                 .args(vec!["/C", &format!(".\\bin\\{}.exe", project_name)])
                 .args(command.subaction)
-                .args(command.options)
-                .status()
-                .expect(&format!("Run \'{}\' occured error!", project_name))
-                .success()
-            {
+                .status()?;
+            if !project_executable_status.success() {
                 return Err(io::Error::new(io::ErrorKind::Other, "Run Error!"));
             }
             Ok(String::from("use g++ to compile project and run it"))
