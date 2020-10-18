@@ -1,7 +1,7 @@
 use qcpro::{Command, QcproReturnKind};
-use std::{process,env};
+use std::{env, process};
 use ansi_term::Colour;
-
+use std::io::{stderr, Write};
 fn main() {
     match Command::new(env::args()) {
         Ok(com) => match com.run_command() {
@@ -15,18 +15,30 @@ fn main() {
             }
             Err(e) => {
                 match env::consts::OS {
-                    "windows" => println!("Error: {:#}", e),
-                    _=>println!("{}: {:#}", Colour::Red.bold().paint("Error"), e),
+                    "windows" => {
+                        let err_output = format!("Error: {:#}", e);
+                        stderr().write_all(err_output.as_bytes()).unwrap();
+                    },
+                    _=> {
+                        let err_output = format!("{}: {:#}", Colour::Red.bold().paint("Error"), e);
+                        stderr().write_all(err_output.as_bytes()).unwrap();
+                    },
                 }
                 process::exit(1);
             }
         }
         Err(s) => {
             match env::consts::OS {
-                "windows" => println!("Error: {:#}", s),
-                _=>println!("{}: {:#}", Colour::Red.bold().paint("Error"), s),
+                "windows" => {
+                    let err_output = format!("Error: {:#}", s);
+                    stderr().write_all(err_output.as_bytes()).unwrap();
+                },
+                _=> {
+                    let err_output = format!("{}: {:#}", Colour::Red.bold().paint("Error"), s);
+                    stderr().write_all(err_output.as_bytes()).unwrap()
+                },
             }
-            process::exit(1);
+            process::exit(2);
         }
     };
 }

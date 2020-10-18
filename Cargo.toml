@@ -1,7 +1,7 @@
 [package]
 name = "qcpro"
 version = "0.2.0"
-authors = ["疯味十三君 <a664554724@qq.com>"]
+authors = ["学少何 <a664554724@qq.com>"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
