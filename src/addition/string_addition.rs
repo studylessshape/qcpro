@@ -1,26 +1,12 @@
 use std::fs;
 
 fn first_index(s: &String, pattern: &str) -> Option<usize> {
-    let mut first: Option<usize> = None;
-    let s_vec:Vec<char> = s.chars().collect();
-    let pat_vec:Vec<char> = pattern.chars().collect();
-
-    for si in 0..s_vec.len() {
-        if pat_vec[0] == s_vec[si] {
-            let mut is_complete_eq: bool = true;
-            for subsi in 0..pat_vec.len() {
-                if si + subsi >= s_vec.len() || s_vec[si + subsi] != pat_vec[subsi] {
-                    is_complete_eq = false;
-                    break;
-                }
-            }
-            if is_complete_eq {
-                first = Some(si);
-                break;
-            }
-        }
+    let matched_patterns : Vec<_> =  s.match_indices(pattern).collect();
+    if matched_patterns.is_empty() {
+        None
+    } else {
+        Some(matched_patterns[0].0)
     }
-    first
 }
 
 /// Get the project name for file contents or last directory of path
