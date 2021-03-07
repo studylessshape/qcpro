@@ -5,7 +5,7 @@ pub mod command;
 pub mod config;
 pub mod help;
 pub mod addition;
-pub use command::{Command, QcproReturnKind};
+pub use command::{Command};
 
 #[cfg(test)]
 mod test {

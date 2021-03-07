@@ -17,11 +17,6 @@ pub struct Command {
     pub options: Vec<String>,
 }
 
-pub enum QcproReturnKind {
-    Success(String),
-    Other,
-}
-
 /// Generate struct Command by args. Split action, subaction, option to different field
 impl Command {
     pub fn new(mut args: std::env::Args) -> Result<Command, &'static str> {
@@ -54,7 +49,7 @@ impl Command {
 
 /// relate project
 impl Command {
-    pub fn run_command(self) -> Result<QcproReturnKind, io::Error> {
+    pub fn run_command(self) -> Result<Option<String>, io::Error> {
         if self.options.len() > 0 {
             let help_s = vec![String::from("--help"), String::from("-h")];
             let version_s = vec![String::from("--version"), String::from("-v")];
@@ -70,7 +65,7 @@ impl Command {
                     ));
                 }
             }
-            return Ok(QcproReturnKind::Other);
+            return Ok(None);
         }
 
         if self.action.len() < 1 {
@@ -96,7 +91,7 @@ impl Command {
                 _ => self.subaction[0].clone(),
             };
             match new::new_project(dir) {
-                Ok(s) => Ok(QcproReturnKind::Success(format!("Create project {}", s))),
+                Ok(s) => Ok(Some(format!("Create project {}", s))),
                 Err(e) => Err(e),
             }
         } else if self.action == _init_s {
@@ -105,7 +100,7 @@ impl Command {
                 _ => self.subaction[0].clone(),
             };
             match initialize::init_project(dir) {
-                Ok(s) => Ok(QcproReturnKind::Success(format!(
+                Ok(s) => Ok(Some(format!(
                     "Initialize project {}",
                     s
                 ))),
@@ -113,12 +108,12 @@ impl Command {
             }
         } else if self.action == _build_s {
             match build::build_project(true) {
-                Ok(s) => Ok(QcproReturnKind::Success(s)),
+                Ok(s) => Ok(Some(s)),
                 Err(e) => Err(e),
             }
         } else if self.action == _run_s {
             match run::run_project(self) {
-                Ok(_) => Ok(QcproReturnKind::Other),
+                Ok(_) => Ok(None),
                 Err(e) => Err(e),
             }
         } else {

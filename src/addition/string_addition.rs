@@ -1,11 +1,12 @@
 use std::fs;
 
+/// Get the first index by pattern
 fn first_index(s: &String, pattern: &str) -> Option<usize> {
-    let matched_patterns : Vec<_> =  s.match_indices(pattern).collect();
-    if matched_patterns.is_empty() {
-        None
+    let matched_pattern : Option<_> = s.match_indices(pattern).next();
+    if let Some((index, _)) = matched_pattern {
+        Some(index)
     } else {
-        Some(matched_patterns[0].0)
+        None
     }
 }
 

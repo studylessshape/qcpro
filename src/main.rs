@@ -1,4 +1,4 @@
-use qcpro::{Command, QcproReturnKind};
+use qcpro::{Command};
 use std::{env, process};
 use ansi_term::Colour;
 use std::io::{stderr, Write};
@@ -6,7 +6,7 @@ fn main() {
     match Command::new(env::args()) {
         Ok(com) => match com.run_command() {
             Ok(skind) => {
-                if let QcproReturnKind::Success(s) = skind {
+                if let Some(s) = skind {
                     match env::consts::OS {
                         "windows" => println!("Success: {}", s),
                         _=>println!("{}: {}",Colour::Green.bold().paint("Success"), s),
