@@ -1,4 +1,5 @@
 - [Qcpro](#qcpro)
+  - [Notice](#notice)
   - [Install](#install)
   - [How to use](#how-to-use)
   - [About Project](#about-project)
@@ -8,6 +9,9 @@
 
 # Qcpro
 Quick c++ project manager, the full name of qcpro, writen by [rust](https://www.rust-lang.org/), is a simple application arm to create and initialize a c++ project.
+
+## Notice
+This is a project used to practice my ability of rust. If need perfect tool, I recommand [Xmake](https://xmake.io/#/)
 
 ## Install
 * [Rust environment](https://www.rust-lang.org/learn/get-started)
