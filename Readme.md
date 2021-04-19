@@ -38,8 +38,8 @@
       export PATH=$PATH:~/(qcpro)/target/debug
       ``` 
       设置永久变量请在.bashrc或.zshrc中添加上面的export指令
-  * Windows安装g++
-    点击此处下载[MinGW](https://sourceforge.net/projects/mingw-w64/)，解压并安装，然后将MinGW目录下的bin文件夹添加到环境变量
+  * Windows安装llvm
+    点击此处下载[MinGW](https://llvm.org/builds/)，解压并安装，然后将MinGW目录下的bin文件夹添加到环境变量
   
 ## How to use
 - 格式

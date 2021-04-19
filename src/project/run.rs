@@ -91,7 +91,7 @@ fn run_win(command: QcproCommand) -> Result<String, io::Error> {
             _ => {}
         }
         //run g++ to compile the files
-        let g_compile_status = Command::new("g++")
+        let g_compile_status = Command::new("clang++")
             .arg("-o")
             .arg(format!("./bin/{}", project_name.clone()))
             .args(build_args)
@@ -109,7 +109,7 @@ fn run_win(command: QcproCommand) -> Result<String, io::Error> {
         } else {
             Err(io::Error::new(
                 io::ErrorKind::Other,
-                "g++ compile project occured error!",
+                "clang compile project occured error!",
             ))
         }
     }
